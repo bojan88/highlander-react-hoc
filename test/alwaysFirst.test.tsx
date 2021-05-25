@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { singleton } from '../src';
+import { alwaysFirstHighlander } from '../src';
 
 describe('always first', () => {
   const Component = ({ ind }) => <div>component {ind}</div>;
-  const Highlander = singleton(Component);
+  const Highlander = alwaysFirstHighlander(Component);
   const query = () => screen.queryAllByText('component', { exact: false });
 
   it('simle', () => {
@@ -37,8 +37,8 @@ describe('always first', () => {
   it('unmount first and mount it again', () => {
     const Component = ({ showFirst = true }) => (
       <div>
-        {showFirst && <Highlander ind={1} />}
-        <Highlander ind={2} />
+        {showFirst && <Highlander key="1" ind={1} />}
+        <Highlander key="2" ind={2} />
       </div>
     );
 

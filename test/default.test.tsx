@@ -1,13 +1,9 @@
 import React, { useEffect } from 'react';
 import { render, screen } from '@testing-library/react';
-import { singleton } from '../src';
+import { highlander } from '../src';
 
-// does not try to always render the first component
-// in case the first component is removed (unmounted), and another rendered
-// if the first becomes available again it won't be rendered
-// and the current one will be kept
 describe('default', () => {
-  const Highlander = singleton(({ ind }) => <div>component {ind}</div>);
+  const Highlander = highlander(({ ind }) => <div>component {ind}</div>);
   const query = () => screen.queryAllByText('component', { exact: false });
 
   it('simle', () => {
@@ -37,6 +33,10 @@ describe('default', () => {
     expect(query()[0].textContent).toBe('component 2');
   });
 
+  // does not try to always render the first component
+  // in case the first component is removed (unmounted), and another rendered
+  // if the first becomes available again it won't be rendered
+  // and the current one will be kept
   it('unmount first and mount it again', () => {
     const Component = ({ showFirst = true }) => (
       <div>
@@ -56,7 +56,7 @@ describe('default', () => {
 
   it('useEffect called', () => {
     const fn = jest.fn();
-    const Highlander = singleton(({ ind }) => {
+    const Highlander = highlander(({ ind }) => {
       useEffect(() => fn(ind), []);
       return null;
     });

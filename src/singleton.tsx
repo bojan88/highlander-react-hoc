@@ -3,6 +3,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 const updatersMap = new Map();
 const currentMap = new Map();
 
+// TODO: add forwardRef
 function Singleton({ children: child }) {
   // using to trigger rerender
   const [, setState] = useState<Function>();
@@ -36,7 +37,7 @@ function Singleton({ children: child }) {
   return currentMap.get(child.type) === setState ? child : null;
 }
 
-export default (Component: any) => (props: any) => (
+export const highlander = (Component: any) => (props: any) => (
   <Singleton>
     <Component {...props} />
   </Singleton>

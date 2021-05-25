@@ -1,1 +1,3 @@
-export { default as singleton } from './singleton';
+// TODO: rename files
+export { highlander } from './singleton';
+export { alwaysFirstHighlander } from './alwaysFirstSingleton';
