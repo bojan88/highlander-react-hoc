@@ -1,36 +1,81 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo, useEffect, useState, Dispatch, ReactElement, Key } from 'react';
 
-const updatersMap = new Map();
-const currentMap = new Map();
+interface IUpdater {
+  mounted: boolean,
+  // current element rendered
+  active: boolean,
+  key: Key | null,
+  updater: Dispatch<Symbol>,
+};
 
-function Singleton({ children: child }) {
+interface ISingletonProps {
+  children: ReactElement
+}
+
+// TODO: update key type
+const updatersMap = new Map<any, Array<IUpdater>>();
+
+const setActive = (item: IUpdater) => {
+  item.active = true;
+  item.updater(Symbol());
+  const activeItem = updatersMap.get(item.updater)
+    ?.find(({ active }) => active === true);
+  if (activeItem) {
+    activeItem.active = false;
+    activeItem.updater(Symbol());
+  }
+};
+
+function Singleton({ children: child }: ISingletonProps) {
   // using to trigger rerender
-  const [, setState] = useState<Function>();
+  const [, setState] = useState<Symbol>();
 
   useMemo(() => {
-    const arr = updatersMap.get(child.type) || [];
-    arr.push(setState);
-    updatersMap.set(child.type, arr);
-    if (arr.length === 1) {
-      currentMap.set(child.type, setState);
+    const arr = updatersMap.get(child?.type) || [];
+    const elKey = child['_owner']?.key;
+
+    if (process.env.NODE_ENV === 'development' && !elKey) {
+      throw new Error('alwaysFirstHighlander requires all components to have React keys');
     }
+
+    const updaterItemIndex = arr.findIndex(({ key }) => key === elKey);
+    const updaterItem = arr[updaterItemIndex];
+    if (updaterItem) {
+      updaterItem.active = false;
+      updaterItem.mounted = updaterItemIndex === 0;
+      updaterItem.updater = setState;
+      setActive(updaterItem);
+    } else {
+      arr.push({
+        mounted: true,
+        active: !arr.some((e) => e.mounted),
+        key: child['_owner']?.key,
+        updater: setState,
+      });
+    }
+    updatersMap.set(child.type, arr);
   }, []);
 
   useEffect(() => () => {
-    const arr = updatersMap.get(child.type).filter((c) => c !== setState);
-    updatersMap.set(child.type, arr);
-    // chech if component is removed
-    if (!arr.includes(currentMap.get(child.type))) {
-      // set the first updater as current, and invoke it to rerender
-      currentMap.set(child.type, arr[0]);
-      arr[0]?.(Symbol());
+    const arr = updatersMap.get(child.type);
+    const updaterEl = arr?.find(({ updater }) => updater !== setState);
+    if (updaterEl) {
+      updaterEl.mounted = false;
+    }
+    if (updaterEl?.active) {
+      updaterEl.active = false;
+      const firstMounted = arr?.find(({ mounted }) => mounted);
+      if (firstMounted) {
+        setActive(firstMounted)
+      }
     }
   }, []);
 
-  return currentMap.get(child.type) === setState ? child : null;
+  const activeUpdaterFn = updatersMap.get(child.type)?.find(({ active }) => active)?.updater;
+  return activeUpdaterFn === setState ? child : null;
 }
 
-export default (Component: any) => (props: any) => (
+export const alwaysFirstHighlander = (Component: any) => (props: any) => (
   <Singleton>
     <Component {...props} />
   </Singleton>

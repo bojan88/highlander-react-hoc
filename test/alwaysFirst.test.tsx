@@ -34,7 +34,7 @@ describe('always first', () => {
     expect(query()[0].textContent).toBe('component 2');
   });
 
-  it('unmount first and mount it again', () => {
+  it.only('unmount first and mount it again', () => {
     const Component = ({ showFirst = true }) => (
       <div>
         {showFirst && <Highlander key="1" ind={1} />}
