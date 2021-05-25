@@ -19,11 +19,17 @@ function Singleton({ children: child }) {
   useEffect(() => () => {
     const arr = updatersMap.get(child.type).filter((c) => c !== setState);
     updatersMap.set(child.type, arr);
+
     // chech if component is removed
     if (!arr.includes(currentMap.get(child.type))) {
       // set the first updater as current, and invoke it to rerender
       currentMap.set(child.type, arr[0]);
       arr[0]?.(Symbol());
+    }
+
+    if (arr.length === 0) {
+      updatersMap.delete(child.type);
+      currentMap.delete(child.type);
     }
   }, []);
 
