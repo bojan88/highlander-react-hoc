@@ -6,7 +6,7 @@ describe('default', () => {
   const Highlander = highlander(({ ind }) => <div>component {ind}</div>);
   const query = () => screen.queryAllByText('component', { exact: false });
 
-  it('simle', () => {
+  it('simple', () => {
     render((
       <div>
         <Highlander ind={1} />

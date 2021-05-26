@@ -7,7 +7,7 @@ describe('always first', () => {
   const Highlander = alwaysFirstHighlander(Component);
   const query = () => screen.queryAllByText('component', { exact: false });
 
-  it('simle', () => {
+  it('simple', () => {
     render((
       <div>
         <Highlander ind={1} />
@@ -34,7 +34,7 @@ describe('always first', () => {
     expect(query()[0].textContent).toBe('component 2');
   });
 
-  it.only('unmount first and mount it again', () => {
+  it('unmount first and mount it again', () => {
     const Component = ({ showFirst = true }) => (
       <div>
         {showFirst && <Highlander key="1" ind={1} />}
