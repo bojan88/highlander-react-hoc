@@ -1,44 +1,47 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
+import { HighlanderLogic, IHighlanderLogic } from './base';
+import Highlander from './highlander';
 
-const updatersMap = new Map();
-const currentMap = new Map();
+class SimpleHighlanderLogic extends HighlanderLogic implements IHighlanderLogic {
+  beforeFirstRender(child, updater) {
+    const arr = this._items.get(child.type) || [];
+    arr.push({
+      mounted: true,
+      active: !arr.some((e) => e.mounted),
+      updater,
+    });
+    this._items.set(child.type, arr);
+    this.setActive(arr[0], true);
+  }
 
-// TODO: add forwardRef
-function Singleton({ children: child }) {
-  // using to trigger rerender
-  const [, setState] = useState<Function>();
+  onUnmount(child, updater) {
+    const updaterObj = this._items.get(child.type)
+      ?.find(({ updater: cUpdater }) => cUpdater === updater);
+    const arr = this._items.get(child.type)?.filter((obj) => obj !== updaterObj);
 
-  useMemo(() => {
-    const arr = updatersMap.get(child.type) || [];
-    arr.push(setState);
-    updatersMap.set(child.type, arr);
-    if (arr.length === 1) {
-      currentMap.set(child.type, setState);
+    if ((arr?.length ?? 0) === 0) {
+      this._items.delete(child.type);
+    } else if (arr) {
+      this._items.set(child.type, arr);
+      if (arr[0]) {
+        this.setActive(arr[0]);
+      }
     }
-  }, []);
+  }
 
-  useEffect(() => () => {
-    const arr = updatersMap.get(child.type).filter((c) => c !== setState);
-    updatersMap.set(child.type, arr);
+  shouldRender(child, updater) {
+    const activeItem = useMemo(
+      () => this._items.get(child.type)?.find(({ active }) => active),
+      [this._items.get(child.type)],
+    );
+    return activeItem?.updater === updater;
+  }
+};
 
-    // chech if component is removed
-    if (!arr.includes(currentMap.get(child.type))) {
-      // set the first updater as current, and invoke it to rerender
-      currentMap.set(child.type, arr[0]);
-      arr[0]?.(Symbol());
-    }
-
-    if (arr.length === 0) {
-      updatersMap.delete(child.type);
-      currentMap.delete(child.type);
-    }
-  }, []);
-
-  return currentMap.get(child.type) === setState ? child : null;
-}
+const highlanderLogic = new SimpleHighlanderLogic();
 
 export const highlander = (Component: any) => (props: any) => (
-  <Singleton>
+  <Highlander highlander={highlanderLogic}>
     <Component {...props} />
-  </Singleton>
+  </Highlander>
 );
