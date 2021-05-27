@@ -1,3 +1,3 @@
 // TODO: rename files
-export { highlander } from './singleton';
+export { highlander } from './default';
 export { prioritizedHighlander } from './prioritized';
