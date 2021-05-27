@@ -10,19 +10,24 @@ class PrioritizedHighlanderLogic extends HighlanderLogic implements IHighlanderL
   beforeFirstRender(child, updater, priority) {
     const arr: IUpdater[] = this._items.get(child.type) || [];
 
-    if (process.env.NODE_ENV !== 'production' && typeof priority === 'undefined') {
-      throw new Error('priorityHighlander requires all components to have "priority" prop');
-    }
+    if (__DEV__) {
+      if (typeof priority === 'undefined') {
+        throw new Error('priorityHighlander requires all components to have "priority" prop');
+      }
 
-    if (process.env.NODE_ENV !== 'production' && typeof priority !== 'number') {
-      throw new Error('"priority" prop only supports numbers');
+      if (typeof priority !== 'number') {
+        throw new Error('"priority" prop only supports numbers');
+      }
     }
 
     const items = arr.filter(({ priority: cPriority }) => cPriority === priority);
     const [updaterItem] = items;
-    const isDuplicate = items.length > 1 || updaterItem?.mounted;
-    if (process.env.NODE_ENV !== 'production' && isDuplicate) {
-      throw new Error('"priority" prop should be unique');
+
+    if (__DEV__) {
+      const isDuplicate = items.length > 1 || updaterItem?.mounted;
+      if (isDuplicate) {
+        throw new Error('"priority" prop should be unique');
+      }
     }
 
     if (updaterItem) {
