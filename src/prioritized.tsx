@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import { HighlanderLogic, IHighlanderLogic, IUpdater } from './base';
 import Highlander from './highlander';
 
@@ -75,8 +75,8 @@ class PrioritizedHighlanderLogic extends HighlanderLogic implements IHighlanderL
 
 const highlanderLogic = new PrioritizedHighlanderLogic();
 
-export const prioritizedHighlander = (Component: any) => ({ priority, ...props }) => (
+export const prioritizedHighlander = (Component: any) => forwardRef(({ priority, ...props }: any, ref: any) => (
   <Highlander priority={priority} highlander={highlanderLogic}>
-    <Component {...props} />
+    <Component {...props} ref={ref} />
   </Highlander>
-);
+));

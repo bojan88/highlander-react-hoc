@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
+
 import { prioritizedHighlander } from '../src';
+import TestComponent from './TestComponent';
 
 describe('prioritized', () => {
-  const Component = ({ ind }) => <div>component {ind}</div>;
-  const Highlander = prioritizedHighlander(Component);
+  const Highlander = prioritizedHighlander(TestComponent);
   const query = () => screen.queryAllByText('component', { exact: false });
 
   it('simple', () => {
@@ -28,8 +29,27 @@ describe('prioritized', () => {
     );
 
     const { rerender } = render(<Component />);
-    rerender(<Component showFirst={false} />);
+    expect(query()).toHaveLength(1);
+    expect(query()[0]?.textContent).toBe('component 2');
 
+    rerender(<Component showFirst={false} />);
+    expect(query()).toHaveLength(1);
+    expect(query()[0]?.textContent).toBe('component 2');
+  });
+
+  it('unmount first with higher priority', () => {
+    const Component = ({ showFirst = true }) => (
+      <div>
+        {showFirst && <Highlander priority={2} ind={1} />}
+        <Highlander priority={1} ind={2} />
+      </div>
+    );
+
+    const { rerender } = render(<Component />);
+    expect(query()).toHaveLength(1);
+    expect(query()[0]?.textContent).toBe('component 1');
+
+    rerender(<Component showFirst={false} />);
     expect(query()).toHaveLength(1);
     expect(query()[0]?.textContent).toBe('component 2');
   });
@@ -48,5 +68,25 @@ describe('prioritized', () => {
 
     expect(query()).toHaveLength(1);
     expect(query()[0]?.textContent).toBe('component 2');
+  });
+
+  it('ref', () => {
+    const ref1 = createRef();
+    const ref2 = createRef();
+
+    const Component = ({ showFirst = true }) => (
+      <div>
+        {showFirst && <Highlander priority={2} ref={ref1} ind={1} />}
+        <Highlander priority={1} ref={ref2} ind={2} />
+      </div>
+    );
+
+    const { rerender } = render(<Component />);
+    expect(ref1.current).toBeTruthy();
+    expect(ref2.current).not.toBeTruthy();
+
+    rerender(<Component showFirst={false} />);
+    expect(ref1.current).not.toBeTruthy();
+    expect(ref2.current).toBeTruthy();
   });
 });

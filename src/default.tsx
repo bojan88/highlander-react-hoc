@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import { HighlanderLogic, IHighlanderLogic } from './base';
 import Highlander from './highlander';
 
@@ -40,8 +40,8 @@ class SimpleHighlanderLogic extends HighlanderLogic implements IHighlanderLogic 
 
 const highlanderLogic = new SimpleHighlanderLogic();
 
-export const highlander = (Component: any) => (props: any) => (
+export const highlander = (Component: any) => forwardRef((props: any, ref: any) => (
   <Highlander highlander={highlanderLogic}>
-    <Component {...props} />
+    <Component {...props} ref={ref} />
   </Highlander>
-);
+));

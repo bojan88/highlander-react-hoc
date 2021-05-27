@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { createRef, useEffect } from 'react';
 import { render, screen } from '@testing-library/react';
+
 import { highlander } from '../src';
+import TestComponent from './TestComponent';
 
 describe('default', () => {
-  const Highlander = highlander(({ ind }) => <div>component {ind}</div>);
+  const Highlander = highlander(TestComponent);
   const query = () => screen.queryAllByText('component', { exact: false });
 
   it('simple', () => {
@@ -72,4 +74,28 @@ describe('default', () => {
     expect(fn).toBeCalledWith('1');
     expect(fn).toBeCalledTimes(1);
   });
+
+  it('ref', () => {
+    const ref1 = createRef();
+    const ref2 = createRef();
+
+    const Component = ({ showFirst = true }) => (
+      <div>
+        {showFirst && <Highlander ref={ref1} ind={1} />}
+        <Highlander ref={ref2} ind={2} />
+      </div>
+    );
+
+    const { rerender } = render(<Component />);
+    expect(ref1.current).toBeTruthy();
+    expect(ref2.current).not.toBeTruthy();
+
+    rerender(<Component showFirst={false} />);
+    expect(ref1.current).not.toBeTruthy();
+    expect(ref2.current).toBeTruthy();
+  });
+
+  // TODO: try to test for cleaning
+  // TODO: test nested components
+  // TODO: test ref
 });
