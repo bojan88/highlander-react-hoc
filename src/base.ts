@@ -38,4 +38,16 @@ export class HighlanderLogic {
       activeItem.updater(Symbol());
     }
   }
+
+  cleanup(child: ReactElement) {
+    const instances: IUpdater[] = this._items.get(child.type);
+    if (!instances) {
+      return;
+    }
+
+    const allUnmounted = Array.from(instances).every(({ mounted }) => !mounted);
+    if (allUnmounted) {
+      this._items.delete(child.type);
+    }
+  }
 }

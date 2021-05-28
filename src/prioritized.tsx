@@ -62,6 +62,9 @@ class PrioritizedHighlanderLogic extends HighlanderLogic implements IHighlanderL
     const maxPriorityItem = getMaxPriorityItem(arr);
     this.setActive(maxPriorityItem);
     this._items.set(child.type, [...arr]);
+    setTimeout(() => {
+      this.cleanup(child);
+    });
   }
 
   shouldRender(child, updater) {

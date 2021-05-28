@@ -27,6 +27,8 @@ class SimpleHighlanderLogic extends HighlanderLogic implements IHighlanderLogic 
         this.setActive(arr[0]);
       }
     }
+
+    this.cleanup(child);
   }
 
   shouldRender(child, updater) {

@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 import { highlander } from '../src';
 import TestComponent from './TestComponent';
+import { HighlanderLogic } from '../src/base';
 
 describe('default', () => {
   const Highlander = highlander(TestComponent);
@@ -95,7 +96,53 @@ describe('default', () => {
     expect(ref2.current).toBeTruthy();
   });
 
-  // TODO: try to test for cleaning
-  // TODO: test nested components
-  // TODO: test ref
+  it('nested', () => {
+    const ComponentOne = () => (
+      <div>
+        <Highlander ind="1" />
+        <Highlander ind="2" />
+      </div>
+    );
+    const ComponentTwo = () => (
+      <div>
+        <Highlander ind="3" />
+        <Highlander ind="4" />
+      </div>
+    );
+    const ParentComponent = ({ showFirst = true }) => (
+      <div>
+        {showFirst && <ComponentOne />}
+        <ComponentTwo />
+      </div>
+    );
+
+    const { rerender } = render(<ParentComponent />);
+    expect(query()[0].textContent).toBe('component 1');
+
+    rerender(<ParentComponent showFirst={false} />)
+    expect(query()[0].textContent).toBe('component 3');
+  });
+
+  it('cleanup', () => {
+    const { unmount, container } = render((
+      <div>
+        <Highlander ind={1} />
+        <Highlander ind={2} />
+      </div>
+    ));
+
+    const [entry] = Object.entries(container.firstChild as Object)
+      .filter(([key]) => key.startsWith('__reactFiber'))
+      .map(([, val]) => val);
+    const internalHighlanderInstance = entry?.firstEffect?.memoizedProps?.highlander;
+
+    let componentsArr = Array.from(internalHighlanderInstance._items.values());
+    expect(internalHighlanderInstance).toBeInstanceOf(HighlanderLogic);
+    expect(componentsArr).toHaveLength(1);
+    expect(componentsArr[0]).toHaveLength(2);
+
+    unmount();
+    componentsArr = Array.from(internalHighlanderInstance._items.values());
+    expect(componentsArr).toHaveLength(0);
+  });
 });

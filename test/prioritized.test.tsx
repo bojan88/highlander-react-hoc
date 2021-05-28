@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 import { prioritizedHighlander } from '../src';
 import TestComponent from './TestComponent';
+import { HighlanderLogic } from '../src/base';
 
 describe('prioritized', () => {
   const Highlander = prioritizedHighlander(TestComponent);
@@ -88,5 +89,30 @@ describe('prioritized', () => {
     rerender(<Component showFirst={false} />);
     expect(ref1.current).not.toBeTruthy();
     expect(ref2.current).toBeTruthy();
+  });
+
+  it('cleanup', async () => {
+    jest.useFakeTimers();
+    const { unmount, container } = render((
+      <div>
+        <Highlander priority={1} ind={1} />
+        <Highlander priority={2} ind={2} />
+      </div>
+    ));
+
+    const [entry] = Object.entries(container.firstChild as Object)
+      .filter(([key]) => key.startsWith('__reactFiber'))
+      .map(([, val]) => val);
+    const internalHighlanderInstance = entry?.firstEffect?.memoizedProps?.highlander;
+
+    let componentsArr = Array.from(internalHighlanderInstance._items.values());
+    expect(internalHighlanderInstance).toBeInstanceOf(HighlanderLogic);
+    expect(componentsArr).toHaveLength(1);
+    expect(componentsArr[0]).toHaveLength(2);
+
+    unmount();
+    jest.runAllTimers();
+    componentsArr = Array.from(internalHighlanderInstance._items.values());
+    expect(componentsArr).toHaveLength(0);
   });
 });
