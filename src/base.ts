@@ -33,7 +33,7 @@ export class HighlanderLogic {
     const activeItem = this._items
       .get(child.type)
       ?.find(({ active }) => active === true);
-    if (activeItem) {
+    if (!skipRender && activeItem) {
       activeItem.active = false;
       activeItem.updater(Symbol());
     }

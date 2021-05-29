@@ -71,6 +71,22 @@ describe('prioritized', () => {
     expect(query()[0]?.textContent).toBe('component 2');
   });
 
+  it('unmount higher priority component and mount it again', () => {
+    const Component = ({ showFirst = true }) => (
+      <div>
+        {showFirst && <Highlander priority={2} ind={1} />}
+        <Highlander priority={1} ind={2} />
+      </div>
+    );
+
+    const { rerender } = render(<Component />);
+    rerender(<Component showFirst={false} />);
+    rerender(<Component />);
+
+    expect(query()).toHaveLength(1);
+    expect(query()[0]?.textContent).toBe('component 1');
+  });
+
   it('ref', () => {
     const ref1 = createRef();
     const ref2 = createRef();
