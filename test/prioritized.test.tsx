@@ -126,4 +126,15 @@ describe('prioritized', () => {
     expect(() => render(<Highlander priority="2" />))
       .toThrow('"priority" prop only supports numbers');
   });
+
+  it('duplicate priority', () => {
+    const Component = () => (
+      <div>
+        <Highlander priority={1} />
+        <Highlander priority={1} />
+      </div>
+    );
+
+    expect(() => render(<Component />)).toThrow('"priority" prop should be unique');
+  });
 });
