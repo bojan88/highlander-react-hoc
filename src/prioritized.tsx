@@ -58,7 +58,7 @@ class PrioritizedHighlanderLogic extends HighlanderLogic
   onMount(child) {
     const arr = this._items.get(child.type);
     const maxPriorityItem = getMaxPriorityItem(arr);
-    this.setActive(maxPriorityItem);
+    this.setActive(child, maxPriorityItem);
     this._items.set(child.type, [...arr]);
   }
 
@@ -71,7 +71,7 @@ class PrioritizedHighlanderLogic extends HighlanderLogic
       updaterEl.mounted = false;
     }
     const maxPriorityItem = getMaxPriorityItem(arr);
-    this.setActive(maxPriorityItem);
+    this.setActive(child, maxPriorityItem);
     this._items.set(child.type, [...arr]);
     setTimeout(() => {
       this.cleanup(child);

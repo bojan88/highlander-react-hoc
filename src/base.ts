@@ -18,7 +18,6 @@ export interface IHighlanderLogic {
   onMount?(child: ReactElement, updater: Dispatch<Symbol>): void;
   onUnmount(child: ReactElement, updater: Dispatch<Symbol>): void;
   shouldRender(child: ReactElement, updater: Dispatch<Symbol>): boolean;
-  setActive(item: IUpdater): void;
 }
 
 export interface IHighlanderReactElement {
@@ -30,17 +29,18 @@ export interface IHighlanderReactElement {
 export class HighlanderLogic {
   _items = new Map();
 
-  setActive(item: IUpdater, skipRender?: boolean) {
-    item.active = true;
-    if (!skipRender && item.mounted) {
-      item.updater(Symbol());
-    }
+  setActive(child: ReactElement, item: IUpdater, skipRender?: boolean) {
     const activeItem = this._items
-      .get(item.updater)
+      .get(child.type)
       ?.find(({ active }) => active === true);
     if (activeItem) {
       activeItem.active = false;
       activeItem.updater(Symbol());
+    }
+
+    item.active = true;
+    if (!skipRender && item.mounted) {
+      item.updater(Symbol());
     }
   }
 

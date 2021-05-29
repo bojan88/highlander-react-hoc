@@ -12,7 +12,7 @@ class SimpleHighlanderLogic extends HighlanderLogic
       updater,
     });
     this._items.set(child.type, arr);
-    this.setActive(arr[0], true);
+    this.setActive(child, arr[0], true);
   }
 
   onUnmount(child, updater) {
@@ -26,7 +26,7 @@ class SimpleHighlanderLogic extends HighlanderLogic
     } else if (arr) {
       this._items.set(child.type, arr);
       if (arr[0]) {
-        this.setActive(arr[0]);
+        this.setActive(child, arr[0]);
       }
     }
 

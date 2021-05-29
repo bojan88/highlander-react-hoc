@@ -116,4 +116,14 @@ describe('prioritized', () => {
     componentsArr = Array.from(internalHighlanderInstance._items.values());
     expect(componentsArr).toHaveLength(0);
   });
+
+  it('throws on missing priority prop', () => {
+    expect(() => render(<Highlander />))
+      .toThrow('priorityHighlander requires all components to have "priority" prop');
+  });
+
+  it('throws on wrong priority prop type', () => {
+    expect(() => render(<Highlander priority="2" />))
+      .toThrow('"priority" prop only supports numbers');
+  });
 });
