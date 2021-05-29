@@ -10,12 +10,12 @@ describe('prioritized', () => {
   const query = () => screen.queryAllByText('component', { exact: false });
 
   it('simple', () => {
-    render((
+    render(
       <div>
         <Highlander priority={1} ind={1} />
         <Highlander priority={2} ind={2} />
       </div>
-    ));
+    );
 
     expect(query()).toHaveLength(1);
     expect(query()[0]?.textContent).toBe('component 2');
@@ -93,17 +93,18 @@ describe('prioritized', () => {
 
   it('cleanup', async () => {
     jest.useFakeTimers();
-    const { unmount, container } = render((
+    const { unmount, container } = render(
       <div>
         <Highlander priority={1} ind={1} />
         <Highlander priority={2} ind={2} />
       </div>
-    ));
+    );
 
     const [entry] = Object.entries(container.firstChild as Object)
       .filter(([key]) => key.startsWith('__reactFiber'))
       .map(([, val]) => val);
-    const internalHighlanderInstance = entry?.firstEffect?.memoizedProps?.highlander;
+    const internalHighlanderInstance =
+      entry?.firstEffect?.memoizedProps?.highlander;
 
     let componentsArr = Array.from(internalHighlanderInstance._items.values());
     expect(internalHighlanderInstance).toBeInstanceOf(HighlanderLogic);

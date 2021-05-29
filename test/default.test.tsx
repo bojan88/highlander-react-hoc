@@ -10,12 +10,12 @@ describe('default', () => {
   const query = () => screen.queryAllByText('component', { exact: false });
 
   it('simple', () => {
-    render((
+    render(
       <div>
         <Highlander ind={1} />
         <Highlander ind={2} />
       </div>
-    ));
+    );
 
     expect(query()).toHaveLength(1);
     expect(query()[0].textContent).toBe('component 1');
@@ -119,22 +119,23 @@ describe('default', () => {
     const { rerender } = render(<ParentComponent />);
     expect(query()[0].textContent).toBe('component 1');
 
-    rerender(<ParentComponent showFirst={false} />)
+    rerender(<ParentComponent showFirst={false} />);
     expect(query()[0].textContent).toBe('component 3');
   });
 
   it('cleanup', () => {
-    const { unmount, container } = render((
+    const { unmount, container } = render(
       <div>
         <Highlander ind={1} />
         <Highlander ind={2} />
       </div>
-    ));
+    );
 
     const [entry] = Object.entries(container.firstChild as Object)
       .filter(([key]) => key.startsWith('__reactFiber'))
       .map(([, val]) => val);
-    const internalHighlanderInstance = entry?.firstEffect?.memoizedProps?.highlander;
+    const internalHighlanderInstance =
+      entry?.firstEffect?.memoizedProps?.highlander;
 
     let componentsArr = Array.from(internalHighlanderInstance._items.values());
     expect(internalHighlanderInstance).toBeInstanceOf(HighlanderLogic);

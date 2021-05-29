@@ -6,11 +6,15 @@ export interface IUpdater {
   active: boolean;
   priority?: number;
   updater: Dispatch<Symbol>;
-};
+}
 
 export interface IHighlanderLogic {
   _items: Map<any, Array<IUpdater>>;
-  beforeFirstRender(child: ReactElement, updater: Dispatch<Symbol>, priority?: number): void;
+  beforeFirstRender(
+    child: ReactElement,
+    updater: Dispatch<Symbol>,
+    priority?: number
+  ): void;
   onMount?(child: ReactElement, updater: Dispatch<Symbol>): void;
   onUnmount(child: ReactElement, updater: Dispatch<Symbol>): void;
   shouldRender(child: ReactElement, updater: Dispatch<Symbol>): boolean;
@@ -31,7 +35,8 @@ export class HighlanderLogic {
     if (!skipRender && item.mounted) {
       item.updater(Symbol());
     }
-    const activeItem = this._items.get(item.updater)
+    const activeItem = this._items
+      .get(item.updater)
       ?.find(({ active }) => active === true);
     if (activeItem) {
       activeItem.active = false;

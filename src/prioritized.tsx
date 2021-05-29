@@ -2,17 +2,24 @@ import React, { forwardRef, useMemo } from 'react';
 import { HighlanderLogic, IHighlanderLogic, IUpdater } from './base';
 import Highlander from './highlander';
 
-const getMaxPriorityItem = (items: IUpdater[]): IUpdater => items
-  .filter(({ mounted }) => mounted)
-  .reduce((acc, el) => (acc.priority ?? 0) < (el.priority ?? 0) ? el : acc, items[0]);
+const getMaxPriorityItem = (items: IUpdater[]): IUpdater =>
+  items
+    .filter(({ mounted }) => mounted)
+    .reduce(
+      (acc, el) => ((acc.priority ?? 0) < (el.priority ?? 0) ? el : acc),
+      items[0]
+    );
 
-class PrioritizedHighlanderLogic extends HighlanderLogic implements IHighlanderLogic {
+class PrioritizedHighlanderLogic extends HighlanderLogic
+  implements IHighlanderLogic {
   beforeFirstRender(child, updater, priority) {
     const arr: IUpdater[] = this._items.get(child.type) || [];
 
     if (__DEV__) {
       if (typeof priority === 'undefined') {
-        throw new Error('priorityHighlander requires all components to have "priority" prop');
+        throw new Error(
+          'priorityHighlander requires all components to have "priority" prop'
+        );
       }
 
       if (typeof priority !== 'number') {
@@ -20,7 +27,9 @@ class PrioritizedHighlanderLogic extends HighlanderLogic implements IHighlanderL
       }
     }
 
-    const items = arr.filter(({ priority: cPriority }) => cPriority === priority);
+    const items = arr.filter(
+      ({ priority: cPriority }) => cPriority === priority
+    );
     const [updaterItem] = items;
 
     if (__DEV__) {
@@ -55,7 +64,9 @@ class PrioritizedHighlanderLogic extends HighlanderLogic implements IHighlanderL
 
   onUnmount(child, updater) {
     const arr = this._items.get(child.type);
-    const updaterEl = arr?.find(({ updater: cUpdater }) => cUpdater === updater);
+    const updaterEl = arr?.find(
+      ({ updater: cUpdater }) => cUpdater === updater
+    );
     if (updaterEl) {
       updaterEl.mounted = false;
     }
@@ -70,16 +81,17 @@ class PrioritizedHighlanderLogic extends HighlanderLogic implements IHighlanderL
   shouldRender(child, updater) {
     const activeItem = useMemo(
       () => this._items.get(child.type)?.find(({ active }) => active),
-      [this._items.get(child.type)],
+      [this._items.get(child.type)]
     );
     return activeItem?.updater === updater;
   }
-};
+}
 
 const highlanderLogic = new PrioritizedHighlanderLogic();
 
-export const prioritizedHighlander = (Component: any) => forwardRef(({ priority, ...props }: any, ref: any) => (
-  <Highlander priority={priority} highlander={highlanderLogic}>
-    <Component {...props} ref={ref} />
-  </Highlander>
-));
+export const prioritizedHighlander = (Component: any) =>
+  forwardRef(({ priority, ...props }: any, ref: any) => (
+    <Highlander priority={priority} highlander={highlanderLogic}>
+      <Component {...props} ref={ref} />
+    </Highlander>
+  ));

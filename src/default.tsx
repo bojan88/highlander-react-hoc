@@ -2,12 +2,13 @@ import React, { forwardRef, useMemo } from 'react';
 import { HighlanderLogic, IHighlanderLogic } from './base';
 import Highlander from './highlander';
 
-class SimpleHighlanderLogic extends HighlanderLogic implements IHighlanderLogic {
+class SimpleHighlanderLogic extends HighlanderLogic
+  implements IHighlanderLogic {
   beforeFirstRender(child, updater) {
     const arr = this._items.get(child.type) || [];
     arr.push({
       mounted: true,
-      active: !arr.some((e) => e.mounted),
+      active: !arr.some(e => e.mounted),
       updater,
     });
     this._items.set(child.type, arr);
@@ -15,9 +16,10 @@ class SimpleHighlanderLogic extends HighlanderLogic implements IHighlanderLogic 
   }
 
   onUnmount(child, updater) {
-    const updaterObj = this._items.get(child.type)
+    const updaterObj = this._items
+      .get(child.type)
       ?.find(({ updater: cUpdater }) => cUpdater === updater);
-    const arr = this._items.get(child.type)?.filter((obj) => obj !== updaterObj);
+    const arr = this._items.get(child.type)?.filter(obj => obj !== updaterObj);
 
     if ((arr?.length ?? 0) === 0) {
       this._items.delete(child.type);
@@ -34,16 +36,17 @@ class SimpleHighlanderLogic extends HighlanderLogic implements IHighlanderLogic 
   shouldRender(child, updater) {
     const activeItem = useMemo(
       () => this._items.get(child.type)?.find(({ active }) => active),
-      [this._items.get(child.type)],
+      [this._items.get(child.type)]
     );
     return activeItem?.updater === updater;
   }
-};
+}
 
 const highlanderLogic = new SimpleHighlanderLogic();
 
-export const highlander = (Component: any) => forwardRef((props: any, ref: any) => (
-  <Highlander highlander={highlanderLogic}>
-    <Component {...props} ref={ref} />
-  </Highlander>
-));
+export const highlander = (Component: any) =>
+  forwardRef((props: any, ref: any) => (
+    <Highlander highlander={highlanderLogic}>
+      <Component {...props} ref={ref} />
+    </Highlander>
+  ));
