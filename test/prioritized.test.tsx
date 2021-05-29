@@ -134,13 +134,15 @@ describe('prioritized', () => {
   });
 
   it('throws on missing priority prop', () => {
-    expect(() => render(<Highlander />))
-      .toThrow('priorityHighlander requires all components to have "priority" prop');
+    expect(() => render(<Highlander />)).toThrow(
+      'priorityHighlander requires all components to have "priority" prop'
+    );
   });
 
   it('throws on wrong priority prop type', () => {
-    expect(() => render(<Highlander priority="2" />))
-      .toThrow('"priority" prop only supports numbers');
+    expect(() => render(<Highlander priority="2" />)).toThrow(
+      '"priority" prop only supports numbers'
+    );
   });
 
   it('duplicate priority', () => {
@@ -151,6 +153,8 @@ describe('prioritized', () => {
       </div>
     );
 
-    expect(() => render(<Component />)).toThrow('"priority" prop should be unique');
+    expect(() => render(<Component />)).toThrow(
+      '"priority" prop should be unique'
+    );
   });
 });
