@@ -1,5 +1,9 @@
 # Highlander React HOC
 
+There can be only one (component in DOM)!
+
+---
+
 Higher order component that allows only one component of the same type to be rendered.
 
 ## Use cases
