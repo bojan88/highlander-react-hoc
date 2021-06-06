@@ -6,6 +6,9 @@ There can be only one (component in DOM)!
 
 Higher order component that allows only one component of the same type to be rendered.
 
+**Note** this doesn't work with `React.StrictMode`.
+Highlander HOC needs application wide tracking of wrapped components and therefore it's not a pure component.
+
 ## Use cases
 
 1. Fire some side effects, and prevent repetition if you have multiple instances of the same component. Example:
